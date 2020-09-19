@@ -8,6 +8,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
@@ -21,6 +23,7 @@ public class SignupForm {
 	
 	//必須入力、半角英数字のみ
 	@NotBlank(message = "{require_check}")
+	@Length(min=4, max=100, message="{length_check}")
 	@Pattern(regexp = "^[a-zA-Z0-9]+$", message= "{pattern_check}")
 	private String password;//パスワード
 	
