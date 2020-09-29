@@ -124,6 +124,11 @@ public class UserDaoJdbcImpl implements UserDao {
 				,user.isMarriage()
 				,user.getUserId());
 		
+		//トランザクション確認のため、わざと例外をthrowする
+		if(rowNumber > 0) {
+			throw new DataAccessException("トランザクションテスト"){};
+		}
+		
 		return rowNumber;
 	}
 	//Userテーブルを1件削除
@@ -138,5 +143,13 @@ public class UserDaoJdbcImpl implements UserDao {
 	@Override
 	public void userCsvOut()throws DataAccessException{
 		
+		//M_USERテーブルの全データを全件取得するSQL
+		String sql = "SELECT * FROM m_user";
+		
+		//ResultSetExtractorの生成
+		UserRowCallbackHandler handler = new UserRowCallbackHandler();
+		
+		//SQL実行&CSV出力
+		jdbc.query(sql, handler);
 	}
 }

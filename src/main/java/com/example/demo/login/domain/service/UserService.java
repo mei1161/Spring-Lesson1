@@ -1,19 +1,34 @@
 package com.example.demo.login.domain.service;
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.example.demo.login.domain.User;
 import com.example.demo.login.domain.repository.UserDao;
-
+@Transactional
 @Service
 public class UserService {
 	
 	@Autowired
-	@Qualifier("UserDaoJdbcImpl3")
 	UserDao dao;
+	
+	//Point: 明示的トランザクション
+	@Autowired
+	PlatformTransactionManager txManager;
+	
 	
 	//insert用メソッド
 	public boolean insert(User user) {
@@ -48,18 +63,38 @@ public class UserService {
 	}
 	
 	//1件更新メソッド
-	public boolean updateOne(User user) {
+	public boolean updateOne(User user) throws DataAccessException {
 		
-		//1件更新
-		int rowNumber = dao.updateOne(user);
+		//インスタンス生成
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		
+		//設定
+		def.setName("UpdateUser");
+		def.setReadOnly(false);
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		
+		//トランザクション開始
+		TransactionStatus status = txManager.getTransaction(def);
 		
 		//判定用変数
 		boolean result = false;
 		
-		if(rowNumber > 0) {
-			//update成功
-			result = true;
+		try {
+			//1件更新
+			int rowNumber = dao.updateOne(user);
+			
+			if(rowNumber > 0) {
+				//update成功
+				result = true;
+			}
+		}catch(Exception e) {
+			//ロールバック
+			txManager.rollback(status);
+			throw new DataAccessException("ERROR Update",e) {};
 		}
+		//コミット
+		txManager.commit(status);
+		
 		return result;
 	}
 	
@@ -76,7 +111,26 @@ public class UserService {
 			result = true;
 		}
 		return result;
-		
 	}
 	
+	//ユーザー一覧をCSV出力
+	public void userCsvOut() throws DataAccessException{
+		//CSV出力
+		dao.userCsvOut();
+	}
+	
+	//サーバーに保存されているファイルを取得して、byte配列に変換する
+	public byte[] getFile(String fileName)throws IOException{
+		
+		//ファイルシステム(デフォルト)の取得
+		FileSystem fs = FileSystems.getDefault();
+		
+		//ファイル取得
+		Path p = fs.getPath(fileName);
+		
+		//ファイルをbyte配列に変換
+		byte[] bytes = Files.readAllBytes(p);
+		
+		return bytes;
+	}
 }
