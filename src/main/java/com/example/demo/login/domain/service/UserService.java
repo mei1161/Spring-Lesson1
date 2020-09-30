@@ -23,6 +23,7 @@ import com.example.demo.login.domain.repository.UserDao;
 public class UserService {
 	
 	@Autowired
+	@Qualifier("UserDaoJdbcImpl")
 	UserDao dao;
 	
 	//Point: 明示的トランザクション
