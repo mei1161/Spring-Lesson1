@@ -12,7 +12,6 @@
 <body class="text-center">
 	<h1>Login</h1>
 	<form method="post" action="/login">
-		<!-- ポイント:ログインエラーメッセージの表示 -->
 		<!-- エラーメッセージ -->
 		<p th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null"
 			th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"
@@ -25,6 +24,8 @@
 		<label>パスワード</label>
 		<input type="password" name="password" /><br>
 		<br>
+		<!-- CSRF対策用トークン -->
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 		<!-- ログインボタン -->
 		<button class="btn btn-primary" type="submit">ログイン</button>
 	</form>
