@@ -2,6 +2,7 @@ package com.example.demo.login.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,7 +53,7 @@ public class UserRestController {
 	@PutMapping("/rest/update")
 	public String putUserOne(@RequestBody User user) {
 		//ユーザーを1件更新
-		boolean result = service.updateOne(user);
+		boolean result = service.update(user);
 		
 		String str = "";
 		
@@ -64,5 +65,21 @@ public class UserRestController {
 		//結果の文字列をリターン
 		return str;
 	}
-	
+	//Point:@DeleteMapping
+	@DeleteMapping("/rest/delete/{id:.+}")
+	public String deleteUserOne(@PathVariable("id")String userId) {
+		
+		//ユーザーを1件削除
+		boolean result = service.delete(userId);
+		
+		String str = "";
+		
+		if(result == true) {
+			str =  "{\"result\":\"ok\"}";
+		}else {
+			str =  "{\"result\":\"error\"}";
+		}
+		//結果用の文字列をリターン
+		return str;
+	}
 }

@@ -133,11 +133,6 @@ public class UserDaoJdbcImpl implements UserDao {
 				,user.isMarriage()
 				,user.getUserId());
 		
-		//トランザクション確認のため、わざと例外をthrowする
-		if(rowNumber > 0) {
-			throw new DataAccessException("トランザクションテスト"){};
-		}
-		
 		return rowNumber;
 	}
 	//Userテーブルを1件削除

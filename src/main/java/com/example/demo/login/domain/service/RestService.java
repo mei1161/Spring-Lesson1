@@ -14,7 +14,7 @@ public interface RestService {
 	public List<User> selectMany();
 	
 	//1件更新用メソッド
-	public boolean updateOne(User user);
+	public boolean update(User user);
 	
 	//1件削除用メソッド
 	public boolean delete(String userId);
